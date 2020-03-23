@@ -13,7 +13,18 @@ class Square extends React.Component{
 
     }
     */
-
+//    componentDidMount(){
+//        this.id = setInterval(() => console.log('hello'), 1000);
+//         document.addEventListener()
+//    }
+   
+//    componentWillUnmount(){
+//        //do some clearing stuff for the application.
+//        //兜底
+//        clearInterval(this.id);
+//        document.removeEventListener()
+   
+// }
     render(){
 
     return (
