@@ -1,54 +1,57 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import Square from './Square';
-
+import { connect } from 'react-redux';
+import { updateSquareAction } from './redux/actions/boardActions';
 
 class Board extends React.Component{
 
-    constructor(props){
-        super(props);
-        this.state = {
-            squares:Array(9).fill(null),
-            isXNext: true   //轮流点击
-        };
-    }
+    // constructor(props){
+    //     super(props);
+    //    // this.state = {
+    //         //squares:Array(9).fill(null),
+    //         //isXNext: true   //轮流点击
+    //     //};
+    // }
 
-    componentDidMount(){
-        console.log('mount');
-    }
+    // componentDidMount(){
+    //     console.log('mount');
+    // }
 
     componentDidUpdate(){
         //alert in componentDidUpdate
         //if in render(), then it will lock the process while rendering;
         // if in handleClick, it will show alert before rerendering.
         // in componentDidUpdate it will check everytime the components get rerendered.
-        const winner = this.calculateWinner(this.state.squares);
+        const winner = this.calculateWinner(this.props.squares);
         if(winner) alert (`The winner is Player ${winner}`);
         
     }
 
 
     handleClick = (index) =>{
-        const hasValue = !this.state.squares[index];
-        const winner = this.calculateWinner(this.state.squares);
-        
+        // const hasValue = !this.state.squares[index];
+        // const winner = this.calculateWinner(this.state.squares);
+        //if(!hasValue || winner ) return;
+        const {squares } = this.props;
 
-        if(!hasValue || winner ) return;
+        if(this.calculateWinner(squares) || squares[index]) return;
 
-        const squares = [...this.state.squares];  //浅拷贝primitive type， 没关系。
+        //const squares = [...this.state.squares];  
+        //浅拷贝primitive type， 没关系。
         //如果arr等，需要深拷贝。因为浅拷贝时是refer by address。
-        squares[index] = this.state.isXNext? 'X': 'O';
-        this.setState( state => ({
-            squares,
-            isXNext:!state.isXNext
-//传一个function。这个function返回的是一个object。这个object返回的将是下一个state
-    }), );
+        //squares[index] = this.props.isXNext? 'X': 'O';
+        this.props.updateSquare(index);
+//         this.setState( state => ({
+//             squares,
+// //传一个function。这个function返回的是一个object。这个object返回的将是下一个state
+//     }), );
                 
     }
 
     renderSquare(index){
         return( 
         <Square  //两个props  
-        value={ this.state.squares[index]} 
+        value={ this.props.squares[index] } 
         handleClick= { () => this.handleClick(index)}  //closure 能保留其function 定义时候的scope。意即在Suqare内运行handleClick() 时也能access到 其定义时的variable：index
         />
         );
@@ -75,8 +78,8 @@ class Board extends React.Component{
       }
 
     render(){
-        const winner = this.calculateWinner(this.state.squares);
-        const status = winner? `Winner: ${winner}`: `next player: ${this.state.isXNext? 'X': 'O'}`;
+        const winner = this.calculateWinner(this.props.squares);
+        const status = winner? `Winner: ${winner}`: `next player: ${this.props.isXNext? 'X': 'O'}`;
         
         
         //return jsx 表达式
@@ -85,7 +88,7 @@ class Board extends React.Component{
     <div className = "status">{status}</div>
     { 
     !winner && (
-    <>
+    <Fragment>
     <div className = "board-row">
             {this.renderSquare(0)}
             {this.renderSquare(1)}
@@ -102,17 +105,31 @@ class Board extends React.Component{
         {this.renderSquare(7)}
         {this.renderSquare(8)}
     </div>
-</>
+</Fragment>
     )
     }
     </div>
 
-
         );
     }
 
+}
+
+const mapStateToProps = state => {
+    //state is global state
+    return {
+        isXNext: state.board.isXNext,
+        squares: state.board.squares
+    };
+};
+
+const mapDispatchToProps = dispatch => {
+    //dispatch is an object
+    return{
+        updateSquare: (index) => dispatch(updateSquareAction(index))
+    }
 
 }
 
-
-export default Board;
+//board: higher order component
+export default connect(mapStateToProps, mapDispatchToProps)(Board) ;

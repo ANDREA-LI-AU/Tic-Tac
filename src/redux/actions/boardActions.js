@@ -1,9 +1,9 @@
 export const UPDATE_SQUARE = 'UPDATE_SQUARE';
 
 
-export const boardActions = (index) => {
+export const updateSquareAction = (index) => {
     return{
-        type: 'UPDATE_SQUARE',
+        type: UPDATE_SQUARE,
         index,
     }
 
